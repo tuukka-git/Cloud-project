@@ -1,0 +1,237 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>backend: Go Coverage Report</title>
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">team-gen/backend/main.go (77.6%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">not covered</span>
+				<span class="cov8">covered</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package main
+
+import (
+        "fmt"
+        "log"
+        "net/http"
+        "os"
+
+        "github.com/gin-contrib/cors"
+        "github.com/gin-gonic/gin"
+        "gorm.io/driver/postgres"
+        "gorm.io/gorm"
+        "gorm.io/gorm/logger"
+)
+
+type App struct {
+        DB *gorm.DB
+}
+
+// Player represents data about a record player.
+type Player struct {
+        ID   int    `json:"id" gorm:"primaryKey"`
+        Name string `json:"name" binding:"required" gorm:"not null"` // Name is required both in request and DB
+}
+
+// getPlayers responds with the list of all players from the database as JSON.
+func (app *App) getPlayers(c *gin.Context) <span class="cov8" title="1">{
+        var players []Player
+        if result := app.DB.Find(&amp;players); result.Error != nil </span><span class="cov8" title="1">{
+                log.Printf("Error querying players from database: %v", result.Error)
+                c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve players"})
+                return
+        }</span>
+
+        <span class="cov8" title="1">c.IndentedJSON(http.StatusOK, players)</span>
+}
+
+// postPlayer adds a new player to the database.
+func (app *App) postPlayer(c *gin.Context) <span class="cov8" title="1">{
+        var newPlayer Player
+
+        // Bind the received JSON to newPlayer with validation.
+        if err := c.ShouldBindJSON(&amp;newPlayer); err != nil </span><span class="cov8" title="1">{
+                log.Printf("Invalid input received for new player: %v", err)
+                c.JSON(http.StatusBadRequest, gin.H{"error": "Name is required"})
+                return
+        }</span>
+
+        // Insert the new player into the database.
+        <span class="cov8" title="1">if result := app.DB.Create(&amp;newPlayer); result.Error != nil </span><span class="cov8" title="1">{
+                log.Printf("Failed to add player '%s' to database: %v", newPlayer.Name, result.Error)
+                c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to add player"})
+                return
+        }</span>
+
+        <span class="cov8" title="1">c.IndentedJSON(http.StatusCreated, newPlayer)</span>
+}
+
+// deletePlayer removes a player from the database based on the provided ID.
+func (app *App) deletePlayer(c *gin.Context) <span class="cov8" title="1">{
+        idParam := c.Param("id")
+        var player Player
+
+        // Find the player by ID
+        if result := app.DB.First(&amp;player, idParam); result.Error != nil </span><span class="cov8" title="1">{
+                log.Printf("Player not found with ID '%s': %v", idParam, result.Error)
+                c.JSON(http.StatusNotFound, gin.H{"error": "Player not found"})
+                return
+        }</span>
+
+        // Delete the player
+        <span class="cov8" title="1">if result := app.DB.Delete(&amp;player); result.Error != nil </span><span class="cov0" title="0">{
+                log.Printf("Failed to delete player with ID '%s': %v", idParam, result.Error)
+                c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete player"})
+                return
+        }</span>
+
+        <span class="cov8" title="1">c.JSON(http.StatusOK, gin.H{"message": "Player deleted"})</span>
+}
+
+func setupRouter(app *App) *gin.Engine <span class="cov8" title="1">{
+        router := gin.Default()
+
+        // CORS configuration
+        router.Use(cors.New(cors.Config{
+                AllowOrigins:     []string{"*"}, // You can customize this to restrict origins
+                AllowMethods:     []string{"GET", "POST", "DELETE", "PUT", "PATCH"},
+                AllowHeaders:     []string{"Origin", "Content-Type", "Accept"},
+                ExposeHeaders:    []string{"Content-Length"},
+                AllowCredentials: true,
+        }))
+
+        router.GET("/players", app.getPlayers)
+        router.POST("/player", app.postPlayer)
+        router.DELETE("/player/:id", app.deletePlayer)
+        return router
+}</span>
+
+func createApp() (*App, error) <span class="cov8" title="1">{
+        // Get the database connection URL from environment variables
+        connStr := os.Getenv("DATABASE_URL")
+        if connStr == "" </span><span class="cov8" title="1">{
+                return nil, fmt.Errorf("DATABASE_URL environment variable is not set")
+        }</span>
+
+        // Connect to the database using GORM
+        <span class="cov8" title="1">db, err := gorm.Open(postgres.Open(connStr), &amp;gorm.Config{
+                Logger: logger.Default.LogMode(logger.Info),
+        })
+        if err != nil </span><span class="cov8" title="1">{
+                return nil, fmt.Errorf("failed to connect to the database: %w", err)
+        }</span>
+
+        // Migrate the schema
+        <span class="cov8" title="1">if err := db.AutoMigrate(&amp;Player{}); err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("failed to migrate database: %w", err)
+        }</span>
+
+        <span class="cov8" title="1">return &amp;App{DB: db}, nil</span>
+}
+
+func main() <span class="cov0" title="0">{
+        // Start the HTTP server
+        app, err := createApp()
+        if err != nil </span><span class="cov0" title="0">{
+                log.Fatalf("Error creating application: %v", err)
+        }</span>
+
+        <span class="cov0" title="0">router := setupRouter(app)
+        log.Println("Starting server on http://localhost:8080")
+        if err := router.Run("localhost:8080"); err != nil </span><span class="cov0" title="0">{
+                log.Fatalf("Error starting server: %v", err)
+        }</span>
+}
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>

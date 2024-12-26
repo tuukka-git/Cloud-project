@@ -1,0 +1,6 @@
+*.sh
+.git/
+.gitignore
+*.out
+*_test.go
+*.html

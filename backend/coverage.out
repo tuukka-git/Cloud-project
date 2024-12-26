@@ -1,0 +1,26 @@
+mode: set
+team-gen/backend/main.go:27.44,29.58 2 1
+team-gen/backend/main.go:29.58,33.3 3 1
+team-gen/backend/main.go:35.2,35.40 1 1
+team-gen/backend/main.go:39.44,43.53 2 1
+team-gen/backend/main.go:43.53,47.3 3 1
+team-gen/backend/main.go:50.2,50.62 1 1
+team-gen/backend/main.go:50.62,54.3 3 1
+team-gen/backend/main.go:56.2,56.47 1 1
+team-gen/backend/main.go:60.46,65.67 3 1
+team-gen/backend/main.go:65.67,69.3 3 1
+team-gen/backend/main.go:72.2,72.59 1 1
+team-gen/backend/main.go:72.59,76.3 3 0
+team-gen/backend/main.go:78.2,78.59 1 1
+team-gen/backend/main.go:81.40,97.2 6 1
+team-gen/backend/main.go:99.32,102.19 2 1
+team-gen/backend/main.go:102.19,104.3 1 1
+team-gen/backend/main.go:107.2,110.16 2 1
+team-gen/backend/main.go:110.16,112.3 1 1
+team-gen/backend/main.go:115.2,115.50 1 1
+team-gen/backend/main.go:115.50,117.3 1 0
+team-gen/backend/main.go:119.2,119.26 1 1
+team-gen/backend/main.go:122.13,125.16 2 0
+team-gen/backend/main.go:125.16,127.3 1 0
+team-gen/backend/main.go:129.2,131.53 3 0
+team-gen/backend/main.go:131.53,133.3 1 0
